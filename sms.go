@@ -16,12 +16,14 @@ const (
 )
 
 type (
+	// BulkSMSInput is passed to SendBulkSMS as a parameter.
 	BulkSMSInput struct {
 		To      []string
 		Message string
 		From    string
 	}
 
+	// BulkSMSRecipient is returned as part of the BulkSMSResponse.
 	BulkSMSRecipient struct {
 		StatusCode uint   `json:"statusCode"`
 		Number     string `json:"number"`
@@ -30,6 +32,7 @@ type (
 		MessageID  string `json:"messageId"`
 	}
 
+	// BulkSMSResponse is returned by SendBulkSMS as a response.
 	BulkSMSResponse struct {
 		SMSMessageData struct {
 			Message    string             `json:"Message"`
@@ -38,6 +41,8 @@ type (
 	}
 )
 
+// SendBulkSMS makes a POST request to send bulk SMS's the Africa's Talking and returns a response.
+// It uses opinionated defaults.
 func (at *atClient) SendBulkSMS(ctx context.Context, input BulkSMSInput) (BulkSMSResponse, error) {
 	bulkSMSResponse := BulkSMSResponse{}
 
