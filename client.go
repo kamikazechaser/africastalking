@@ -11,7 +11,7 @@ const (
 )
 
 type (
-	atClient struct {
+	AtClient struct {
 		apiKey     string
 		endpoint   string
 		httpClient *http.Client
@@ -20,8 +20,8 @@ type (
 )
 
 // New returns an instance of an Africa's Talking client reusbale across different products.
-func New(apiKey string, username string, sandbox bool) *atClient {
-	atClient := &atClient{
+func New(apiKey string, username string, sandbox bool) *AtClient {
+	AtClient := &AtClient{
 		apiKey: apiKey,
 		httpClient: &http.Client{
 			Timeout: time.Second * 5,
@@ -30,23 +30,23 @@ func New(apiKey string, username string, sandbox bool) *atClient {
 	}
 
 	if sandbox {
-		atClient.endpoint = baseSandboxEndpoint
+		AtClient.endpoint = baseSandboxEndpoint
 	} else {
-		atClient.endpoint = baseLiveEndpoint
+		AtClient.endpoint = baseLiveEndpoint
 	}
 
-	return atClient
+	return AtClient
 }
 
 // SetHTTPClient can be used to override the default client with a custom set one.
-func (at *atClient) SetHTTPClient(httpClient *http.Client) *atClient {
+func (at *AtClient) SetHTTPClient(httpClient *http.Client) *AtClient {
 	at.httpClient = httpClient
 
 	return at
 }
 
 // setDefaultHeaders sets the standard headers required by the Africa's Talking API.
-func (at *atClient) setDefaultHeaders(req *http.Request) *http.Request {
+func (at *AtClient) setDefaultHeaders(req *http.Request) *http.Request {
 	req.Header.Set("apiKey", at.apiKey)
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")

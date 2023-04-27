@@ -43,7 +43,7 @@ type (
 
 // SendBulkSMS makes a POST request to send bulk SMS's the Africa's Talking and returns a response.
 // It uses opinionated defaults.
-func (at *atClient) SendBulkSMS(ctx context.Context, input BulkSMSInput) (BulkSMSResponse, error) {
+func (at *AtClient) SendBulkSMS(ctx context.Context, input BulkSMSInput) (BulkSMSResponse, error) {
 	bulkSMSResponse := BulkSMSResponse{}
 
 	form := url.Values{
