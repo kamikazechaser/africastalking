@@ -24,7 +24,7 @@ func New(apiKey string, username string, sandbox bool) *AtClient {
 	AtClient := &AtClient{
 		apiKey: apiKey,
 		httpClient: &http.Client{
-			Timeout: time.Second * 5,
+			Timeout: time.Second * 10,
 		},
 		username: username,
 	}
