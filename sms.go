@@ -3,16 +3,12 @@ package africastalking
 import (
 	"bytes"
 	"context"
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net/http"
 	"net/url"
 	"strings"
 )
 
 const (
-	smsPath = "messaging"
+	smsApiPath = "messaging"
 )
 
 type (
@@ -59,28 +55,12 @@ func (at *AtClient) SendBulkSMS(ctx context.Context, input BulkSMSInput) (BulkSM
 		form.Set("from", input.From)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, at.endpoint+smsPath, bytes.NewBufferString(form.Encode()))
-	if err != nil {
-		return bulkSMSResponse, err
-	}
-	req = at.setDefaultHeaders(req)
-
-	resp, err := at.httpClient.Do(req)
+	resp, err := at.postRequestWithCtx(ctx, at.endpoint+smsApiPath, bytes.NewBufferString(form.Encode()))
 	if err != nil {
 		return bulkSMSResponse, err
 	}
 
-	respData, err := ioutil.ReadAll(resp.Body)
-	_ = resp.Body.Close()
-	if err != nil {
-		return bulkSMSResponse, err
-	}
-
-	if resp.StatusCode >= http.StatusBadRequest {
-		return bulkSMSResponse, fmt.Errorf("status code: %s: %q", resp.Status, respData)
-	}
-
-	if err := json.Unmarshal(respData, &bulkSMSResponse); err != nil {
+	if err := parseResponse(resp, &bulkSMSResponse); err != nil {
 		return bulkSMSResponse, err
 	}
 

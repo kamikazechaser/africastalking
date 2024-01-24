@@ -1,6 +1,10 @@
 package africastalking
 
 import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 	"time"
 )
@@ -52,4 +56,35 @@ func (at *AtClient) setDefaultHeaders(req *http.Request) *http.Request {
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	return req
+}
+
+// postRequestWithCtx builds the HTTP request
+func (at *AtClient) postRequestWithCtx(ctx context.Context, url string, body io.Reader) (*http.Response, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, body)
+	if err != nil {
+		return nil, err
+	}
+
+	return at.do(req)
+}
+
+// do executes the built http request, setting appropriate headers
+func (at *AtClient) do(req *http.Request) (*http.Response, error) {
+	return at.httpClient.Do(at.setDefaultHeaders(req))
+}
+
+// parseResponse is a general utility to decode JSON responses correctly
+func parseResponse(resp *http.Response, target interface{}) error {
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= http.StatusBadRequest {
+		b, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+
+		return fmt.Errorf("AT server error: code=%s: response_body=%s", resp.Status, string(b))
+	}
+
+	return json.NewDecoder(resp.Body).Decode(target)
 }

@@ -6,6 +6,7 @@ import (
 	"testing"
 )
 
+// E2E Test
 func TestAfricasTalking_SendBulkSMS(t *testing.T) {
 	apiKey := os.Getenv("TEST_AT_API_KEY")
 	username := os.Getenv("TEST_AT_USERNAME")
@@ -24,10 +25,12 @@ func TestAfricasTalking_SendBulkSMS(t *testing.T) {
 
 	resp, err := testAtClient.SendBulkSMS(context.Background(), testData)
 	if err != nil {
-		t.Fatalf("Failed: %v", err)
+		t.Fatalf("Failed: %+v\n", err)
 	}
 
 	if resp.SMSMessageData.Recipients[0].Status != "Success" {
-		t.Fatalf("Failed: %v", err)
+		t.Fatalf("Failed: %+v\n", err)
 	}
+
+	t.Logf("Success: %+v\n", resp)
 }
