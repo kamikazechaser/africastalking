@@ -53,7 +53,7 @@ func (at *AtClient) SetHTTPClient(httpClient *http.Client) *AtClient {
 func (at *AtClient) setDefaultHeaders(req *http.Request) *http.Request {
 	req.Header.Set("apiKey", at.apiKey)
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("Content-Type", "application/json")
 
 	return req
 }

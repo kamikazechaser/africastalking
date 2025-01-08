@@ -3,20 +3,19 @@ package africastalking
 import (
 	"bytes"
 	"context"
-	"net/url"
-	"strings"
+	"encoding/json"
 )
 
 const (
-	smsApiPath = "messaging"
+	smsApiPath = "messaging/bulk"
 )
 
 type (
 	// BulkSMSInput is passed to SendBulkSMS as a parameter.
 	BulkSMSInput struct {
-		To      []string
-		Message string
-		From    string
+		Message      string   `json:"message"`
+		SenderID     string   `json:"senderId"`
+		PhoneNumbers []string `json:"phoneNumbers"`
 	}
 
 	// BulkSMSRecipient is returned as part of the BulkSMSResponse.
@@ -40,22 +39,26 @@ type (
 // SendBulkSMS makes a POST request to send bulk SMS's the Africa's Talking and returns a response.
 // It uses opinionated defaults.
 func (at *AtClient) SendBulkSMS(ctx context.Context, input BulkSMSInput) (BulkSMSResponse, error) {
-	bulkSMSResponse := BulkSMSResponse{}
+	var (
+		buf             bytes.Buffer
+		bulkSMSResponse BulkSMSResponse
+	)
 
-	form := url.Values{
-		"username":             {at.username},
-		"to":                   {strings.Join(input.To, ",")},
-		"message":              {input.Message},
-		"bulkSMSMode":          {"1"},
-		"enqueue":              {"1"},
-		"retryDurationInHours": {"1"},
+	if err := json.NewEncoder(&buf).Encode(struct {
+		Username     string   `json:"username"`
+		Message      string   `json:"message"`
+		SenderID     string   `json:"senderId"`
+		PhoneNumbers []string `json:"phoneNumbers"`
+	}{
+		Username:     at.username,
+		Message:      input.Message,
+		SenderID:     input.SenderID,
+		PhoneNumbers: input.PhoneNumbers,
+	}); err != nil {
+		return bulkSMSResponse, err
 	}
 
-	if input.From != "" {
-		form.Set("from", input.From)
-	}
-
-	resp, err := at.postRequestWithCtx(ctx, at.endpoint+smsApiPath, bytes.NewBufferString(form.Encode()))
+	resp, err := at.postRequestWithCtx(ctx, at.endpoint+smsApiPath, &buf)
 	if err != nil {
 		return bulkSMSResponse, err
 	}

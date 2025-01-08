@@ -10,17 +10,16 @@ import (
 func TestAfricasTalking_SendBulkSMS(t *testing.T) {
 	apiKey := os.Getenv("TEST_AT_API_KEY")
 	username := os.Getenv("TEST_AT_USERNAME")
-	sandbox := true
+	sandbox := false
 
 	testAtClient := New(apiKey, username, sandbox)
 
 	testData := BulkSMSInput{
-		To: []string{
-			"+254722123123",
+		PhoneNumbers: []string{
 			"+254723123123",
 		},
-		From:    "",
-		Message: "kamikazechaser/africastalking test",
+		SenderID: "",
+		Message:  "kamikazechaser/africastalking test",
 	}
 
 	resp, err := testAtClient.SendBulkSMS(context.Background(), testData)
